@@ -270,9 +270,9 @@ I used CSS Grid and Flexbox throughout. The sidebar auto-collapses on screens �
 
 ## 👤 Author
 
-**Your Name**  
-📧 your.email@example.com  
-🔗 [LinkedIn](https://linkedin.com) | [GitHub](https://github.com)
+**princy meena**  
+📧 princymeena2005@gmail.com  
+🔗 [LinkedIn](https://linkedin.com/in/princy-meena-82982a247/) | [GitHub](https://github.com/princymee)
 
 ---
 
