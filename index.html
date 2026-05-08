@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseTrack — Smart Finance Manager</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-bg">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+    <div class="auth-container">
+      <div class="auth-brand">
+        <div class="brand-icon"><i class="fa-solid fa-chart-line"></i></div>
+        <h1>ExpenseTrack</h1>
+        <p>Take control of your finances</p>
+      </div>
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="tab-btn active" data-tab="login">Sign In</button>
+          <button class="tab-btn" data-tab="register">Sign Up</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-tab" class="tab-content active">
+          <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="login-email" placeholder="Email address" />
+          </div>
+          <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="login-password" placeholder="Password" />
+            <span class="toggle-pw" onclick="togglePw('login-password')"><i class="fa-solid fa-eye"></i></span>
+          </div>
+          <button class="btn-primary" onclick="loginUser()">
+            <span>Sign In</span><i class="fa-solid fa-arrow-right"></i>
+          </button>
+          <div class="divider"><span>or continue with</span></div>
+          <button class="btn-google" onclick="loginGoogle()">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"/>
+            Google
+          </button>
+          <p class="auth-switch">Don't have an account? <a onclick="switchTab('register')">Sign up free</a></p>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-tab" class="tab-content">
+          <div class="input-group">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="reg-name" placeholder="Full name" />
+          </div>
+          <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="reg-email" placeholder="Email address" />
+          </div>
+          <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="reg-password" placeholder="Create password" />
+            <span class="toggle-pw" onclick="togglePw('reg-password')"><i class="fa-solid fa-eye"></i></span>
+          </div>
+          <button class="btn-primary" onclick="registerUser()">
+            <span>Create Account</span><i class="fa-solid fa-arrow-right"></i>
+          </button>
+          <p class="auth-switch">Already have an account? <a onclick="switchTab('login')">Sign in</a></p>
+        </div>
+
+        <div id="auth-error" class="auth-error"></div>
+        <div id="auth-loader" class="auth-loader hidden"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app-screen" class="screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon sm"><i class="fa-solid fa-chart-line"></i></div>
+        <span class="brand-name">ExpenseTrack</span>
+        <button class="sidebar-close" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="user-info" id="sidebar-user">
+        <div class="user-avatar" id="user-avatar-text">A</div>
+        <div>
+          <p class="user-name" id="user-display-name">User</p>
+          <p class="user-email" id="user-display-email">user@email.com</p>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-section="dashboard" onclick="navigateTo('dashboard')">
+          <i class="fa-solid fa-house"></i><span>Dashboard</span>
+        </a>
+        <a class="nav-item" data-section="expenses" onclick="navigateTo('expenses')">
+          <i class="fa-solid fa-list"></i><span>All Expenses</span>
+        </a>
+        <a class="nav-item" data-section="analytics" onclick="navigateTo('analytics')">
+          <i class="fa-solid fa-chart-pie"></i><span>Analytics</span>
+        </a>
+        <a class="nav-item" data-section="budget" onclick="navigateTo('budget')">
+          <i class="fa-solid fa-wallet"></i><span>Budget</span>
+        </a>
+      </nav>
+      <button class="btn-logout" onclick="logoutUser()">
+        <i class="fa-solid fa-right-from-bracket"></i><span>Sign Out</span>
+      </button>
+    </aside>
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-actions">
+          <button class="btn-add-expense" onclick="openModal()">
+            <i class="fa-solid fa-plus"></i><span>Add Expense</span>
+          </button>
+          <div class="notif-btn"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></div>
+        </div>
+      </header>
+
+      <!-- DASHBOARD SECTION -->
+      <section id="section-dashboard" class="content-section active">
+        <div class="section-header">
+          <h2>Good <span id="greeting-time">morning</span>, <span id="greeting-name">there</span> 👋</h2>
+          <p>Here's your financial overview</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card highlight">
+            <div class="stat-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            <div class="stat-info">
+              <span class="stat-label">Total Spent</span>
+              <span class="stat-value" id="total-spent">₹0</span>
+            </div>
+            <div class="stat-trend up" id="trend-spent">↑ This month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="fa-solid fa-calendar-day"></i></div>
+            <div class="stat-info">
+              <span class="stat-label">Today's Spend</span>
+              <span class="stat-value" id="today-spent">₹0</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange"><i class="fa-solid fa-receipt"></i></div>
+            <div class="stat-info">
+              <span class="stat-label">Transactions</span>
+              <span class="stat-value" id="total-count">0</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple"><i class="fa-solid fa-tag"></i></div>
+            <div class="stat-info">
+              <span class="stat-label">Top Category</span>
+              <span class="stat-value sm" id="top-category">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bar Chart -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3>Weekly Overview</h3>
+            <span class="card-subtitle" id="chart-week-label">This Week</span>
+          </div>
+          <div class="bar-chart" id="bar-chart"></div>
+        </div>
+
+        <!-- Recent Expenses -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Recent Expenses</h3>
+            <a class="see-all" onclick="navigateTo('expenses')">See all →</a>
+          </div>
+          <div class="expense-list" id="recent-expenses">
+            <div class="empty-state"><i class="fa-solid fa-receipt"></i><p>No expenses yet. Add your first one!</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ALL EXPENSES SECTION -->
+      <section id="section-expenses" class="content-section">
+        <div class="section-header">
+          <h2>All Expenses</h2>
+          <p>Manage and track every transaction</p>
+        </div>
+        <div class="filters-row">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="search-input" placeholder="Search expenses..." oninput="filterExpenses()"/>
+          </div>
+          <select id="filter-category" onchange="filterExpenses()" class="filter-select">
+            <option value="">All Categories</option>
+            <option value="Food">🍔 Food</option>
+            <option value="Transport">🚗 Transport</option>
+            <option value="Shopping">🛍️ Shopping</option>
+            <option value="Bills">💡 Bills</option>
+            <option value="Entertainment">🎬 Entertainment</option>
+            <option value="Health">🏥 Health</option>
+            <option value="Education">📚 Education</option>
+            <option value="Other">📦 Other</option>
+          </select>
+          <select id="filter-sort" onchange="filterExpenses()" class="filter-select">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="highest">Highest Amount</option>
+            <option value="lowest">Lowest Amount</option>
+          </select>
+        </div>
+        <div class="expense-list full" id="all-expenses">
+          <div class="empty-state"><i class="fa-solid fa-receipt"></i><p>No expenses yet.</p></div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS SECTION -->
+      <section id="section-analytics" class="content-section">
+        <div class="section-header">
+          <h2>Analytics</h2>
+          <p>Deep dive into your spending habits</p>
+        </div>
+        <div class="analytics-grid">
+          <div class="card">
+            <div class="card-header"><h3>By Category</h3></div>
+            <div class="donut-chart-wrap">
+              <canvas id="donut-canvas" width="220" height="220"></canvas>
+              <div class="donut-center">
+                <span id="donut-total">₹0</span>
+                <small>Total</small>
+              </div>
+            </div>
+            <div class="legend" id="donut-legend"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Monthly Breakdown</h3></div>
+            <div class="monthly-list" id="monthly-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BUDGET SECTION -->
+      <section id="section-budget" class="content-section">
+        <div class="section-header">
+          <h2>Budget Manager</h2>
+          <p>Set and track your spending limits</p>
+        </div>
+        <div class="budget-setup card">
+          <h3>Set Monthly Budget</h3>
+          <div class="budget-input-row">
+            <div class="input-group">
+              <i class="fa-solid fa-indian-rupee-sign"></i>
+              <input type="number" id="budget-amount" placeholder="Enter budget amount" min="0"/>
+            </div>
+            <button class="btn-primary sm" onclick="saveBudget()">Save Budget</button>
+          </div>
+        </div>
+        <div class="budget-progress-card card">
+          <div class="budget-header">
+            <span>Monthly Budget</span>
+            <span id="budget-label">₹0 / ₹0</span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar" id="budget-progress-bar" style="width:0%"></div>
+          </div>
+          <p id="budget-remaining">Set a budget to track your spending</p>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Budget by Category</h3></div>
+          <div id="category-budgets"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ADD EXPENSE MODAL -->
+  <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModalOutside(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Add Expense</h3>
+        <button onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <i class="fa-solid fa-pen"></i>
+          <input type="text" id="expense-title" placeholder="Expense title (e.g. Coffee)" />
+        </div>
+        <div class="input-group">
+          <i class="fa-solid fa-indian-rupee-sign"></i>
+          <input type="number" id="expense-amount" placeholder="Amount" min="0" step="0.01"/>
+        </div>
+        <div class="input-group">
+          <i class="fa-solid fa-tag"></i>
+          <select id="expense-category">
+            <option value="">Select category</option>
+            <option value="Food">🍔 Food</option>
+            <option value="Transport">🚗 Transport</option>
+            <option value="Shopping">🛍️ Shopping</option>
+            <option value="Bills">💡 Bills</option>
+            <option value="Entertainment">🎬 Entertainment</option>
+            <option value="Health">🏥 Health</option>
+            <option value="Education">📚 Education</option>
+            <option value="Other">📦 Other</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <i class="fa-solid fa-calendar"></i>
+          <input type="date" id="expense-date" />
+        </div>
+        <div class="input-group">
+          <i class="fa-solid fa-note-sticky"></i>
+          <input type="text" id="expense-note" placeholder="Note (optional)" />
+        </div>
+        <input type="hidden" id="editing-id" />
+        <div id="modal-error" class="auth-error"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveExpense()">
+          <span id="save-btn-text">Save Expense</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Firebase -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
